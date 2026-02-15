@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-
+@app.route("/")
+def home():
+    return "✅ Chatbot backend is live"
 @app.route('/webhook', methods=['POST'])
 def webhook():
     req = request.get_json(silent=True)
@@ -34,4 +36,5 @@ if __name__ == "__main__":
     import os
 
 app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
