@@ -24,7 +24,23 @@
       chatBox.innerHTML += `<div><b>You:</b> ${userText}</div>`;
       input.value = "";
 
-      // TODO: Send userText to Dialogflow and show reply
+      fetch("YOUR_WEBHOOK_URL_HERE", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    query: userText
+  })
+})
+.then(response => response.json())
+.then(data => {
+  chatBox.innerHTML += `<div><b>Bot:</b> ${data.reply}</div>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+})
+.catch(error => {
+  chatBox.innerHTML += `<div><b>Bot:</b> Oops, something went wrong 😅</div>`;
+});
     }
   </script>
 </body>
