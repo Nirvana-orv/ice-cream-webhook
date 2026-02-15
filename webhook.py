@@ -7,7 +7,9 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     return "✅ Chatbot backend is live"
-
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({"reply": "Oops, something went wrong on server 😅"}), 200
 # Webhook route for your chatbot
 @app.route("/webhook", methods=["POST"])
 def webhook():
@@ -19,10 +21,9 @@ def webhook():
     user_text = req.get("query", "")
     
     # If parameters exist (Dialogflow style), extract them
-    parameters = req.get("queryResult", {}).get("parameters", {})
-    flavor = parameters.get("Flavour")
-    size = parameters.get("Size")
-    topping = parameters.get("topping")
+    flavor = req.get("flavor") or req.get("Flavour")
+    size = req.get("size") or req.get("Size")
+    topping = req.get("topping")
 
     # If parameters exist, respond with ice cream order
     if flavor or size or topping:
@@ -52,3 +53,4 @@ def webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
