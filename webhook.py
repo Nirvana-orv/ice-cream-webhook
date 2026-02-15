@@ -1,40 +1,54 @@
 from flask import Flask, request, jsonify
+import os
 
 app = Flask(__name__)
+
+# Home route to test if backend is live
 @app.route("/")
 def home():
     return "✅ Chatbot backend is live"
-@app.route('/webhook', methods=['POST'])
+
+# Webhook route for your chatbot
+@app.route("/webhook", methods=["POST"])
 def webhook():
     req = request.get_json(silent=True)
+    if not req:
+        return jsonify({"reply": "Sorry, I didn't get that."})
 
+    # Check if it's coming from Dialogflow or custom UI
+    user_text = req.get("query", "")
+    
+    # If parameters exist (Dialogflow style), extract them
     parameters = req.get("queryResult", {}).get("parameters", {})
+    flavor = parameters.get("Flavour")
+    size = parameters.get("Size")
+    topping = parameters.get("topping")
 
-    flavor = parameters.get("Flavour", "ice cream")
-    size = parameters.get("Size", "medium")
-    topping = parameters.get("topping", "no topping")
+    # If parameters exist, respond with ice cream order
+    if flavor or size or topping:
+        flavor = flavor or "ice cream"
+        size = size or "medium"
+        topping = topping or "no topping"
 
-    price = 0
-    if size == "small":
-        price = 60
-    elif size == "medium":
-        price = 80
-    elif size == "large":
-        price = 100
+        price = 0
+        if size.lower() == "small":
+            price = 60
+        elif size.lower() == "medium":
+            price = 80
+        elif size.lower() == "large":
+            price = 100
 
-    if topping not in ["no", "none", "no topping"]:
-        price += 20
+        if topping.lower() not in ["no", "none", "no topping"]:
+            price += 20
 
-    reply = f"Your {size} {flavor} ice cream with {topping} costs ₹{price}."
+        reply = f"Your {size} {flavor} ice cream with {topping} costs ₹{price}."
+    else:
+        # Default reply for custom UI messages
+        reply = f"You said: {user_text}"
 
-    return jsonify({
-        "reply": reply
-    })
+    return jsonify({"reply": reply})
 
+# Run the app on Render
 if __name__ == "__main__":
-
-    import os
-
-app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
