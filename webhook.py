@@ -26,8 +26,9 @@ def webhook():
     reply = f"Your {size} {flavor} ice cream with {topping} costs ₹{price}."
 
     return jsonify({
-        "fulfillmentText": reply
+        "reply": reply
     })
 
 if __name__ == "__main__":
+
     app.run(port=5000)
