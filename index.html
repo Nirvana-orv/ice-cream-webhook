@@ -24,7 +24,7 @@
       chatBox.innerHTML += `<div><b>You:</b> ${userText}</div>`;
       input.value = "";
 
-      fetch("YOUR_WEBHOOK_URL_HERE", {
+      fetch("https://ice-cream-webhook.onrender.com/webhook", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
