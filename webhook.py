@@ -3,81 +3,57 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-CORS(app)  # allows cross-origin requests from your HTML UI
+CORS(app)
 
-# Home route to check if backend is live
 @app.route("/")
 def home():
     return "✅ Chatbot backend is live"
 
-# Webhook route for ice cream orders
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    try:
-        req = request.get_json(force=True)  # parse JSON
+    data = request.get_json(force=True)
+    text = data.get("query", "").lower()
 
-        # Extract custom UI input
-        user_text = req.get("query", "")
+    # detect size
+    size = "medium"
+    if "small" in text:
+        size = "small"
+    elif "large" in text:
+        size = "large"
 
-        # Try to get order parameters from UI or Dialogflow
-        flavor = req.get("flavor") or req.get("Flavour") or req.get("queryResult", {}).get("parameters", {}).get("Flavour")
-        size = req.get("size") or req.get("Size") or req.get("queryResult", {}).get("parameters", {}).get("Size")
-        topping = req.get("topping") or req.get("queryResult", {}).get("parameters", {}).get("topping")
+    # detect flavor
+    flavor = None
+    flavors = ["chocolate", "vanilla", "strawberry", "mango"]
+    for f in flavors:
+        if f in text:
+            flavor = f
+            break
 
-        # If any of flavor, size, or topping exists, calculate price
-        if flavor or size or topping:
-            flavor = flavor or "ice cream"
-            size = size or "medium"
-            topping = topping or "no topping"
+    # detect topping
+    topping = "no topping"
+    if "sprinkle" in text:
+        topping = "sprinkles"
+    elif "nuts" in text:
+        topping = "nuts"
 
-            # base price by size
-            size_lower = size.lower()
-            if size_lower == "small":
-                price = 60
-            elif size_lower == "medium":
-                price = 80
-            elif size_lower == "large":
-                price = 100
-            else:
-                price = 80  # default medium
+    # pricing
+    price = 80
+    if size == "small":
+        price = 60
+    elif size == "large":
+        price = 100
 
-            # add topping price
-            if topping.lower() not in ["no", "none", "no topping"]:
-                price += 20
+    if topping != "no topping":
+        price += 20
 
-            reply = f"Your {size} {flavor} ice cream with {topping} costs ₹{price}."
-        else:
-            text = user_text.lower()
+    # response logic
+    if "ice cream" in text or flavor:
+        reply = f"🍦 A {size} {flavor or 'ice cream'} with {topping} will cost ₹{price}. Want anything else?"
+    else:
+        reply = "🙂 I'm here with you. Tell me more."
 
-            if any(greet in text for greet in ["hi", "hello", "hey"]):
-                reply = "Heyyy 👋 I’m here. What’s on your mind?"
+    return jsonify({"reply": reply})
 
-            elif "how are you" in text:
-                reply = "I’m doing pretty good 😊 What about you?"
-
-            elif "your name" in text or "who are you" in text:
-                reply = "I’m your friendly chatbot 🤖 Built by a cool human."
-
-            elif "sad" in text or "upset" in text or "tired" in text:
-                reply = "That sounds rough 😕 Want to talk about it?"
-
-            elif "happy" in text or "excited" in text:
-                reply = "Ayy that’s awesome 😄 Tell me more!"
-
-            elif "joke" in text:
-                reply = "Why don’t programmers like ice cream in production? Too many bugs 🍦🐛"
-
-            else:
-                reply = "Hmm 🤔 tell me more about that."
-
-        return jsonify({"reply": reply})
-
-    except Exception as e:
-        # Catch all errors so frontend always gets JSON
-        return jsonify({"reply": "Oops, something went wrong on server 😅"}), 200
-
-# Run on Render
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
