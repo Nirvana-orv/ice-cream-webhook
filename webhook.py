@@ -47,8 +47,28 @@ def webhook():
 
             reply = f"Your {size} {flavor} ice cream with {topping} costs ₹{price}."
         else:
-            # Default reply for any other message
-            reply = f"You said: {user_text}"
+            text = user_text.lower()
+
+            if any(greet in text for greet in ["hi", "hello", "hey"]):
+                reply = "Heyyy 👋 I’m here. What’s on your mind?"
+
+            elif "how are you" in text:
+                reply = "I’m doing pretty good 😊 What about you?"
+
+            elif "your name" in text or "who are you" in text:
+                reply = "I’m your friendly chatbot 🤖 Built by a cool human."
+
+            elif "sad" in text or "upset" in text or "tired" in text:
+                reply = "That sounds rough 😕 Want to talk about it?"
+
+            elif "happy" in text or "excited" in text:
+                reply = "Ayy that’s awesome 😄 Tell me more!"
+
+            elif "joke" in text:
+                reply = "Why don’t programmers like ice cream in production? Too many bugs 🍦🐛"
+
+            else:
+                reply = "Hmm 🤔 tell me more about that."
 
         return jsonify({"reply": reply})
 
@@ -60,3 +80,4 @@ def webhook():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
