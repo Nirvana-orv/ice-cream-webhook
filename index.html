@@ -1,47 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ice Cream Ordering AI 🍦</title>
+  <title>Chat Companion 🤖</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: white;
+      width: 360px;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+
+    .user {
+      background: #007bff;
+      color: white;
+      margin-left: auto;
+    }
+
+    .bot {
+      background: #e5e5ea;
+      color: black;
+      margin-right: auto;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>Chat with Me 🤖</h1>
 
-  <div id="chat-box" style="border:1px solid #ccc; height:400px; width:350px; overflow-y:auto; padding:10px;">
-    <div><b>Bot:</b> Hi! I’m here to chat 😊</div>
+<div class="chat-container">
+  <div class="chat-box" id="chat-box">
+    <div class="message bot">Hi! I’m here to chat 😊</div>
   </div>
 
-  <input id="user-input" type="text" placeholder="Type a message..." style="width:260px;">
-  <button onclick="sendMessage()">Send</button>
+  <div class="input-area">
+    <input id="user-input" type="text" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
 
-  <script>
-    function sendMessage() {
-      const input = document.getElementById("user-input");
-      const chatBox = document.getElementById("chat-box");
+<script>
+function sendMessage() {
+  const input = document.getElementById("user-input");
+  const chatBox = document.getElementById("chat-box");
+  const text = input.value.trim();
+  if (!text) return;
 
-      const userText = input.value;
-      if (!userText) return;
+  chatBox.innerHTML += `<div class="message user">${text}</div>`;
+  input.value = "";
 
-      chatBox.innerHTML += `<div><b>You:</b> ${userText}</div>`;
-      input.value = "";
-
-      fetch("https://ice-cream-webhook.onrender.com/webhook", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    query: userText
+  fetch("https://ice-cream-webhook.onrender.com/webhook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: text })
   })
-})
-.then(response => response.json())
-.then(data => {
-  chatBox.innerHTML += `<div><b>Bot:</b> ${data.reply}</div>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
-})
-.catch(error => {
-  chatBox.innerHTML += `<div><b>Bot:</b> Oops, something went wrong 😅</div>`;
-});
-    }
-  </script>
+  .then(res => res.json())
+  .then(data => {
+    chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+  })
+  .catch(() => {
+    chatBox.innerHTML += `<div class="message bot">Server error 😅</div>`;
+  });
+}
+</script>
+
 </body>
 </html>
