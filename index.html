@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ICE CREAM ORDER! 🤖</title>
+  <title>ScoopBot 🍦</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -14,25 +14,38 @@
 
     .chat-container {
       background: white;
-      width: 360px;
-      height: 500px;
+      width: 420px;
+      height: 600px;
       display: flex;
       flex-direction: column;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: #ff8c42;
+      color: white;
+      padding: 14px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
 
     .chat-box {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       overflow-y: auto;
+      background: #fafafa;
     }
 
     .message {
       margin: 8px 0;
-      padding: 8px 12px;
-      border-radius: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
       max-width: 80%;
+      line-height: 1.4;
+      white-space: pre-line;
     }
 
     .user {
@@ -47,6 +60,23 @@
       margin-right: auto;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background: #ffe0c3;
+    }
+
     .input-area {
       display: flex;
       border-top: 1px solid #ddd;
@@ -54,29 +84,82 @@
 
     input {
       flex: 1;
-      padding: 10px;
+      padding: 14px;
       border: none;
       outline: none;
+      font-size: 1rem;
     }
 
     button {
-      padding: 10px;
+      padding: 14px 18px;
       border: none;
-      background: #007bff;
+      background: #ff8c42;
       color: white;
       cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #ff7a22;
     }
   </style>
 </head>
+
 <body>
 
 <div class="chat-container">
+  <div class="header">ScoopBot 🍨</div>
+
   <div class="chat-box" id="chat-box">
-    <div class="message bot">Hi! Which ice cream would you like to order? 😊</div>
+    <div class="message bot">
+      <strong>Welcome! Here’s our menu 🍦</strong>
+
+      <table>
+        <tr>
+          <th>Size</th>
+          <th>Price</th>
+        </tr>
+        <tr><td>Small</td><td>₹60</td></tr>
+        <tr><td>Medium</td><td>₹80</td></tr>
+        <tr><td>Large</td><td>₹100</td></tr>
+      </table>
+
+      <br>
+
+      <table>
+        <tr>
+          <th>Flavors</th>
+          <th>Toppings (+₹20)</th>
+        </tr>
+        <tr>
+          <td>Vanilla</td>
+          <td>Sprinkles</td>
+        </tr>
+        <tr>
+          <td>Chocolate</td>
+          <td>Choco Chips</td>
+        </tr>
+        <tr>
+          <td>Strawberry</td>
+          <td>Nuts</td>
+        </tr>
+        <tr>
+          <td>Mango</td>
+          <td>Caramel</td>
+        </tr>
+        <tr>
+          <td>Butterscotch</td>
+          <td>—</td>
+        </tr>
+      </table>
+
+      <br>
+      Try: <em>“Large chocolate with sprinkles”</em>
+    </div>
   </div>
 
   <div class="input-area">
-    <input id="user-input" type="text" placeholder="Type a message..." />
+    <input id="user-input" type="text" placeholder="Type your order..." />
     <button onclick="sendMessage()">Send</button>
   </div>
 </div>
