@@ -5,55 +5,70 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+SIZES = {
+    "small": 60,
+    "medium": 80,
+    "large": 100
+}
+
+FLAVORS = [
+    "vanilla",
+    "chocolate",
+    "strawberry",
+    "mango",
+    "butterscotch"
+]
+
+TOPPINGS = [
+    "sprinkles",
+    "choco chips",
+    "chips",
+    "nuts",
+    "caramel"
+]
+
 @app.route("/")
 def home():
-    return "✅ Chatbot backend is live"
+    return "✅ ScoopBot backend is live"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json(force=True)
-    text = data.get("query", "").lower()
+    req = request.get_json(force=True)
+    text = req.get("query", "").lower()
 
-    # detect size
-    size = "medium"
-    if "small" in text:
-        size = "small"
-    elif "large" in text:
-        size = "large"
+    # Detect size
+    size = next((s for s in SIZES if s in text), None)
 
-    # detect flavor
-    flavor = None
-    flavors = ["chocolate", "vanilla", "strawberry", "mango"]
-    for f in flavors:
-        if f in text:
-            flavor = f
-            break
+    # Detect flavor
+    flavor = next((f for f in FLAVORS if f in text), None)
 
-    # detect topping
-    topping = "no topping"
-    if "sprinkle" in text:
-        topping = "sprinkles"
-    elif "nuts" in text:
-        topping = "nuts"
+    # Detect topping
+    topping = next((t for t in TOPPINGS if t in text), None)
 
-    # pricing
-    price = 80
-    if size == "small":
-        price = 60
-    elif size == "large":
-        price = 100
+    if size and flavor:
+        price = SIZES[size]
+        topping_text = "no topping"
 
-    if topping != "no topping":
-        price += 20
+        if topping:
+            price += 20
+            topping_text = topping
 
-    # response logic
-    if "ice cream" in text or flavor:
-        reply = f"🍦 A {size} {flavor or 'ice cream'} with {topping} will cost ₹{price}. Want anything else?"
+        reply = (
+            f"🍦 Order confirmed!\n"
+            f"{size.capitalize()} {flavor} ice cream\n"
+            f"Topping: {topping_text}\n"
+            f"Total: ₹{price}"
+        )
     else:
-        reply = "🙂 I'm here with you. Tell me more."
+        reply = (
+            "Here’s our menu 🍨\n"
+            "Sizes: Small ₹60, Medium ₹80, Large ₹100\n"
+            "Flavors: Vanilla, Chocolate, Strawberry, Mango, Butterscotch\n"
+            "Toppings (+₹20): Sprinkles, Choco Chips, Nuts, Caramel\n\n"
+            "Try: “Large chocolate with sprinkles”"
+        )
 
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
